@@ -9,7 +9,11 @@ class Gui:
 
     csvData = None
 
-    def __init__(self):
+    def __init__(self, width, heigth):
+        self.width = width
+        self.heigth = heigth
+
+    def start(self):
         self.root = tkinter.Tk()
         self.guiInit()
         self.root.mainloop()
@@ -17,13 +21,11 @@ class Gui:
     def guiInit(self):
         tkinter.Label(self.root, text="Labeltext").grid(row=0)
         self.root.title("FinanceControl")
-        w = 800
-        h = 800
         ws = self.root.winfo_screenwidth()
         hs = self.root.winfo_screenheight()
-        x = (ws/2)-(w/2)
-        y = (hs/2)-(h/2)
-        self.root.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        x = (ws/2)-(self.width/2)
+        y = (hs/2)-(self.heigth/2)
+        self.root.geometry('%dx%d+%d+%d' % (self.width, self.heigth, x, y))
         self.root.grid_rowconfigure(4, minsize=100)
         tkinter.Label(self.root, text="Name").grid(row=1)
         tkinter.Entry(self.root).grid(row=1,  column=1)
@@ -61,12 +63,10 @@ class Gui:
     def workOnlyWithNewCsvOrAddIt(self):
         chooseWindow = tkinter.Tk()
         chooseWindow.title("")
-        rootWidth = 800
-        rootHeigth = 800
         screenWidth = self.root.winfo_screenwidth()
         screenHeight = self.root.winfo_screenheight()
-        x = (screenWidth/2) - (rootWidth/2)
-        y = (screenHeight/2) - (rootHeigth/2)
+        x = (screenWidth/2) - (self.width/2)
+        y = (screenHeight/2) - (self.heigth/2)
         chooseWindow.geometry('+%d+%d' % (x, y))
         tkinter.Button(
             chooseWindow, text="Mit aktueller CSV Datei arbeiten",  command=(lambda a=True, f=chooseWindow: self.addOrReplaceCsvByNewCSV(f, a))).grid(column=0, row=0)
@@ -85,10 +85,9 @@ class Gui:
                 rowIndex = 0
                 for row in reader:
                     colIndex = 0
-                    for colIndex in row:
-                        label = tkinter.Label(root, width=10, height=2,
-                                              text=rowIndex, relief=tkinter.RIDGE)
-                        label.grid(row=rowIndex, column=colIndex)
+                    for col in row:
+                        tkinter.Label(root, text=col).grid(
+                            row=rowIndex, column=colIndex)
                         colIndex += 1
                     rowIndex += 1
         else:
@@ -101,4 +100,5 @@ class Gui:
             messagebox.showinfo('No', 'Quit has been cancelled')
 
 
-Gui()
+startingGui = Gui(800, 800)
+startingGui.start()
