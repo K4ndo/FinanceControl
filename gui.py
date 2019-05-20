@@ -1,68 +1,104 @@
 import tkinter
-import tkinter.filedialog
-
-fields = {"a", "b", "c"}
-
-
-def fetch(entries):
-    for entry in entries:
-        field = entry[0]
-        text = entry[1].get()
-        print('%s: "%s"' % (field, text))
-        openFileDiaglogue()
+import tkinter.filedialog as filedialog
+from tkinter import Button
+from tkinter import messagebox
+import csv
 
 
-def makeform(root, fields):
-    entries = []
-    for field in fields:
-        frame = Frame(root)
-        lab = Label(frame, width=25, text=field, anchor='w', justify=LEFT)
-        ent = Entry(frame, justify=LEFT)
-        b1 = Button(frame, text='browse',
-                    command=(openFileDiaglogue))
-        frame.pack(side=TOP, fill=NONE, padx=10, pady=10)
-        lab.pack(side=LEFT)
-        #ent.pack(side=LEFT, expand=YES, fill=X)
-        ent.pack(side=LEFT)
+class Gui:
 
-        if field is fields[2]:
-            # entries.append((field, ent))
-            lab.setvar("test", 1)
-            b1.pack(expand=YES, fill=X)
+    csvData = None
 
-        entries.append((field, ent))
+    def __init__(self):
+        self.root = tkinter.Tk()
+        self.guiInit()
+        self.root.mainloop()
 
-    return entries
+    def guiInit(self):
+        tkinter.Label(self.root, text="Labeltext").grid(row=0)
+        self.root.title("FinanceControl")
+        w = 800
+        h = 800
+        ws = self.root.winfo_screenwidth()
+        hs = self.root.winfo_screenheight()
+        x = (ws/2)-(w/2)
+        y = (hs/2)-(h/2)
+        self.root.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        self.root.grid_rowconfigure(4, minsize=100)
+        tkinter.Label(self.root, text="Name").grid(row=1)
+        tkinter.Entry(self.root).grid(row=1,  column=1)
+        tkinter.Label(self.root, text="Prename").grid(row=2)
+        tkinter.Entry(self.root).grid(row=2,  column=1)
+        tkinter.Button(self.root, text='Importiere neue CSV Datei',
+                       command=self.importNewCsvData).grid(row=4, column=0)
+        tkinter.Button(self.root, text='Arbeite mit bereites geladenen CSV Dateien',
+                       command=self.showCsvOnDisplay).grid(row=4, column=1)
+        tkinter.Button(self.root, text="Close", command=self.root.quit).grid(
+            row=4, column=2)
+
+    def setLabelName(self, name):
+        self.title = name
+
+    def indexRowAndIncrease(self, oldRowIndex):
+        '''returns the actual index of the row in the grid and increases it by 1'''
+
+        rowIndex = oldRowIndex + 1
+        return rowIndex
+
+    def indexColumnAndIncrease(self, oldColumnIndex):
+        '''returns the actual index of the column in the grid and increases it by 1'''
+
+        columnIndex = oldColumnIndex + 1
+        return columnIndex
+
+    def importNewCsvData(self):
+        ''' '''
+        self.csvData = filedialog.askopenfilename(filetypes=(
+            ("csv files", "*.csv"), ("all files", "*.*")))
+        if self.csvData:
+            self.workOnlyWithNewCsvOrAddIt()
+
+    def workOnlyWithNewCsvOrAddIt(self):
+        chooseWindow = tkinter.Tk()
+        chooseWindow.title("")
+        rootWidth = 800
+        rootHeigth = 800
+        screenWidth = self.root.winfo_screenwidth()
+        screenHeight = self.root.winfo_screenheight()
+        x = (screenWidth/2) - (rootWidth/2)
+        y = (screenHeight/2) - (rootHeigth/2)
+        chooseWindow.geometry('+%d+%d' % (x, y))
+        tkinter.Button(
+            chooseWindow, text="Mit aktueller CSV Datei arbeiten",  command=(lambda a=True, f=chooseWindow: self.addOrReplaceCsvByNewCSV(f, a))).grid(column=0, row=0)
+        tkinter.Button(
+            chooseWindow, text="CSV Datei bestehenden Daten hinzufügen",  command=(lambda a=False, f=chooseWindow: self.addOrReplaceCsvByNewCSV(f, a))).grid(column=1, row=0)
+
+    def addOrReplaceCsvByNewCSV(self, frame, add=True):
+        frame.destroy()
+
+    def showCsvOnDisplay(self):
+        if self.csvData:
+            root = tkinter.Tk()
+            with open(self.csvData, 'r') as csvfile:
+                print(self.csvData)
+                reader = csv.reader(csvfile, delimiter=';')
+                rowIndex = 0
+                for row in reader:
+                    colIndex = 0
+                    for colIndex in row:
+                        label = tkinter.Label(root, width=10, height=2,
+                                              text=rowIndex, relief=tkinter.RIDGE)
+                        label.grid(row=rowIndex, column=colIndex)
+                        colIndex += 1
+                    rowIndex += 1
+        else:
+            print(5)
+
+    def testfunction(self):
+        if messagebox.askyesno('Verify', 'Really quit?'):
+            messagebox.showwarning('Yes', 'Not yet implemented')
+        else:
+            messagebox.showinfo('No', 'Quit has been cancelled')
 
 
-def openFileDiaglogue():
-
-    file = filedialog.askopenfile(
-        parent=master, mode='rb', title='Choose a file')
-    pathlabel.config(text=file)
-    pathlabel.pack()
-    print(file.name)
-    if file != None:
-        data = file.read()
-        file.close()
-
-        print("I got %d bytes from this file." % len(data))
-
-
-if __name__ == '__main__':
-    master = tkinter.Tk()
-    master.geometry("500x500")
-    ents = makeform(master, fields)
-    #master.bind('<Return>', (lambda event, e=ents: fetch(e)))
-    pathlabel = tkinter.Label(master)
-
-    b1 = tkinter.Button(master, text='Show',
-                        command=(lambda e=ents: fetch(e)))
-    b1.pack(side=tkinter.LEFT, padx=5, pady=5)
-    b2 = tkinter.Button(master, text='Quit', command=master.quit)
-    b2.pack(side=tkinter.LEFT, padx=5, pady=5)
-    b3 = tkinter.Button(master, text='browse', command=openFileDiaglogue)
-    b3.pack(side=tkinter.LEFT, padx=5, pady=5)
-
-
-master.mainloop()
+Gui()
