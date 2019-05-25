@@ -13,14 +13,16 @@ def _create_entry_row(root, name, with_browse_button=False):
     frame = tkinter.Frame(root)
     frame.pack(side=tkinter.TOP, fill=tkinter.X, padx=10, pady=10)
 
-    field_name_label = tkinter.Label(frame, width=25, text=name, anchor='w', justify=tkinter.LEFT)
+    field_name_label = tkinter.Label(
+        frame, width=25, text=name, anchor='w', justify=tkinter.LEFT)
     field_name_label.pack(anchor=tkinter.W, side=tkinter.LEFT)
 
     entry = tkinter.Entry(frame, justify=tkinter.LEFT)
     entry.pack(anchor=tkinter.W, side=tkinter.LEFT, fill=tkinter.X)
 
     if with_browse_button:
-        browse_button = tkinter.Button(frame, text='browse', command=_open_file_dialog)
+        browse_button = tkinter.Button(
+            frame, text='browse', command=_open_file_dialog)
         browse_button.pack(anchor=tkinter.W)
     return entry
 
@@ -32,13 +34,15 @@ def _make_form(root):
     last_name = "Nachname"
     field_names_and_entries[last_name] = _create_entry_row(root, last_name)
     statement_path = "Kontoauszug"
-    field_names_and_entries[statement_path] = _create_entry_row(root, statement_path, with_browse_button=True)
+    field_names_and_entries[statement_path] = _create_entry_row(
+        root, statement_path, with_browse_button=True)
     return field_names_and_entries
 
 
 def _open_file_dialog():
     # FIXME Niemals eine Variable "file" nennen (ist ein Python-Keyword)
-    chosen_file = tkinter.filedialog.askopenfile(parent=master, mode='rb', title='Choose a file')
+    chosen_file = tkinter.filedialog.askopenfile(
+        parent=master, mode='rb', title='Choose a file')
     pathlabel.config(text=chosen_file)
     pathlabel.pack()
     if chosen_file:
@@ -56,7 +60,8 @@ if __name__ == '__main__':
     entries = _make_form(master)
     pathlabel = tkinter.Label(master)
 
-    b1 = tkinter.Button(master, text='Show', command=(lambda e=entries: _print_entered_data(e)))
+    b1 = tkinter.Button(master, text='Show', command=(
+        lambda e=entries: _print_entered_data(e)))
     b1.pack(side=tkinter.LEFT, padx=5, pady=5)
     b2 = tkinter.Button(master, text='Quit', command=master.quit)
     b2.pack(side=tkinter.LEFT, padx=5, pady=5)

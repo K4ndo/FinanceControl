@@ -1,0 +1,8 @@
+{
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.pep8Enabled": false,
+    "python.linting.mypyEnabled": false,
+    "editor.wordWrap": "on",
+    "editor.wordWrapColumn": 120
+}
