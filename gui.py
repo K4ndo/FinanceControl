@@ -1,5 +1,6 @@
 """blabla class"""
 
+from dataModel import DataModel
 import tkinter
 import tkinter.filedialog as filedialog
 from tkinter import Button
@@ -9,7 +10,9 @@ import csv
 
 class Gui:
     '''bla bla'''
+
     csv_data = None
+    data_model = None
     #root = None
 
     def __init__(self, width, heigth):
@@ -49,12 +52,12 @@ class Gui:
 
     def import_new_csv_data(self):
         ''''''
-        self.csv_data = filedialog.askopenfilename(filetypes=(
+        csv_file = filedialog.askopenfilename(filetypes=(
             ("csv files", "*.csv"), ("all files", "*.*")))
-        if self.csv_data:
-            self.workOnlyWithNewCsvOrAddIt()
+        if csv_file:
+            self.workOnlyWithNewCsvOrAddIt(csv_file)
 
-    def workOnlyWithNewCsvOrAddIt(self):
+    def workOnlyWithNewCsvOrAddIt(self, csv_file):
         choose_window = tkinter.Tk()
         choose_window.title("")
         screen_width = self.root.winfo_screenwidth()
@@ -63,16 +66,31 @@ class Gui:
         y = (screen_height/2) - (self.heigth/2)
         choose_window.geometry('+%d+%d' % (x, y))
         tkinter.Button(
-            choose_window, text="Mit aktueller CSV Datei arbeiten", command=(lambda a=True, f=choose_window: self.add_or_replace_csv_by_new_csv(f, a))).grid(column=0, row=0)
+            choose_window, text="Mit aktueller CSV Datei arbeiten", command=(lambda frame=choose_window, csv=csv_file, add=False: self.add_or_replace_data_in_data_model(frame, csv, add))).grid(column=0, row=0)
         tkinter.Button(
-            choose_window, text="CSV Datei bestehenden Daten hinzufügen", command=(lambda a=False, f=choose_window: self.add_or_replace_csv_by_new_csv(f, a))).grid(column=1, row=0)
+            choose_window, text="CSV Datei bestehenden Daten hinzufügen", command=(lambda frame=choose_window, csv=csv_file, add=True: self.add_or_replace_data_in_data_model(frame, csv, add))).grid(column=1, row=0)
 
-    def add_or_replace_csv_by_new_csv(self, frame, add=True):
+    def add_or_replace_data_in_data_model(self, frame, csv_file, add):
         """"""
+        parsed_csv_rows = self.parse_csv_to_rows(csv_file)
+        if add and self.data_model:
+            self.data_model.add_rows(parsed_csv_rows)
+        else:
+            self.data_model = DataModel(parsed_csv_rows)
         frame.destroy()
+
+    def parse_csv_to_rows(self, csv_file):
+        with open(csv_file, 'r') as csv_data:
+            reader = csv.reader(csv_data, delimiter=';')
+            parsed_rows = []
+            for csv_row in reader:
+                parsed_rows.append(csv_row)
+        return parsed_rows
 
     def show_csv_on_display(self):
         """"""
+        self.data_model.show_relevant_data()
+    """
         if self.csv_data:
             root = tkinter.Tk()
             with open(self.csv_data, 'r') as csvfile:
@@ -87,7 +105,8 @@ class Gui:
                         col_index += 1
                     row_index += 1
         else:
-            print(5)
+            raise Exception('I know Python2!')
+    """
 
     def testfunction(self):
         """"""
