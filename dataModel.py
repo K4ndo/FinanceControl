@@ -1,11 +1,12 @@
 import tkinter
 from RowCategories import RowCategories
 from Rows import Row
-from copy import deepcopy
+
 
 class DataModel:
     ''''''
-    relevant_data = [RowCategories.AUFTRAGSKONTO.value, RowCategories.BETRAG.value, RowCategories.BUCHUNGSTAG.value]
+    relevant_data = [RowCategories.AUFTRAGSKONTO.value,
+                     RowCategories.BETRAG.value, RowCategories.BUCHUNGSTAG.value]
 
     def __init__(self, input_data=None):
         self.data = []
@@ -18,8 +19,8 @@ class DataModel:
 
         print(self.data)
 
-
     def show_relevant_data(self):
+        ''' blub'''
         root = tkinter.Tk()
         row_index = 0
         for data_row in self.data:

@@ -1,6 +1,8 @@
 from enum import Enum
 
 class RowCategories(Enum):
+    """"blub"""
+
     AUFTRAGSKONTO = "AUFTRAGSKONTO"
     BUCHUNGSTAG = "BUCHUNGSTAG"
     VALUTADATUM = "VALUTADATUM"
