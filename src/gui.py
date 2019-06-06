@@ -13,7 +13,6 @@ class Gui:
 
     csv_data = None
     data_model = None
-    #root = None
 
     def __init__(self, width, heigth):
         self.width = width
@@ -80,6 +79,7 @@ class Gui:
         frame.destroy()
 
     def parse_csv_to_rows(self, csv_file):
+        """ ist eigentlich keine Gui FUnktion, für eine PArserklasse aber zu trivial?"""
         with open(csv_file, 'r') as csv_data:
             reader = csv.reader(csv_data, delimiter=';')
             parsed_rows = []
@@ -90,32 +90,6 @@ class Gui:
     def show_csv_on_display(self):
         """"""
         self.data_model.show_relevant_data()
-    """
-        if self.csv_data:
-            root = tkinter.Tk()
-            with open(self.csv_data, 'r') as csvfile:
-                print(self.csv_data)
-                reader = csv.reader(csvfile, delimiter=';')
-                row_index = 0
-                for row in reader:
-                    col_index = 0
-                    for col in row:
-                        tkinter.Label(root, text=col).grid(
-                            row=row_index, column=col_index)
-                        col_index += 1
-                    row_index += 1
-        else:
-            raise Exception('I know Python2!')
-    """
-
-    def testfunction(self):
-        """"""
-        if messagebox.askyesno('Verify', 'Really quit?'):
-            messagebox.showwarning('Yes', 'Not yet implemented')
-        else:
-            messagebox.showinfo('No', 'Quit has been cancelled')
-
 
 STARTING_GUI = Gui(800, 800)
 STARTING_GUI.start()
-#model = data_model(Gui.csvData)

@@ -1,8 +1,8 @@
 from RowCategories import RowCategories
-"""classdoc"""
+
+
 class Row:
-
-
+    """classdoc"""
     def __init__(self, row_data):
         self.row_dict = {}
         self.parse_data_to_row_dict(row_data)
@@ -10,14 +10,15 @@ class Row:
     def parse_data_to_row_dict(self, row_data):
         """bla"""
         if(len(row_data) is not len(RowCategories)):
-            #exception
-            raise Exception('I know Python!')
+            # exception
+            raise Exception("Länge der eingegebenen Daten ist ungültig")
         for row_value, row_category in zip(row_data, RowCategories):
             self.row_dict[row_category.name] = row_value
 
     def get_auftragskonto(self):
         """lol"""
         return self.row_dict[RowCategories.AUFTRAGSKONTO.value]
+
     def get_buchungstag(self):
         """test"""
         return self.row_dict[RowCategories.BUCHUNGSTAG.value]
