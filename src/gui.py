@@ -1,11 +1,14 @@
 """blabla class"""
 
-from dataModel import DataModel
+from typing import List
+
 import tkinter
 import tkinter.filedialog as filedialog
 from tkinter import Button
 from tkinter import messagebox
 import csv
+
+from RowCategories import RowCategories
 
 
 class Gui:
@@ -14,9 +17,10 @@ class Gui:
     csv_data = None
     data_model = None
 
-    def __init__(self, width, heigth):
+    def __init__(self, width: int, heigth: int, ctr: "Controller"):
         self.width = width
         self.heigth = heigth
+        self._ctr = ctr
 
     def start(self):
         '''seriously'''
@@ -39,9 +43,9 @@ class Gui:
         tkinter.Label(self.root, text="Prename").grid(row=2)
         tkinter.Entry(self.root).grid(row=2, column=1)
         Button(self.root, text='Importiere neue CSV Datei',
-               command=self.import_new_csv_data).grid(row=4, column=0)
+               command=self.open_csv_import_dialog).grid(row=4, column=0)
         tkinter.Button(self.root, text='Arbeite mit bereites geladenen CSV Dateien',
-                       command=self.show_csv_on_display).grid(row=4, column=1)
+                       command=self._ctr.on_display_data_callback).grid(row=4, column=1)
         tkinter.Button(self.root, text="Close", command=self.root.quit).grid(
             row=4, column=2)
 
@@ -49,11 +53,12 @@ class Gui:
         """ b"""
         self.title = name
 
-    def import_new_csv_data(self):
+    def open_csv_import_dialog(self):
         ''''''
         csv_file = filedialog.askopenfilename(filetypes=(
             ("csv files", "*.csv"), ("all files", "*.*")))
         if csv_file:
+            # FIXME: Make this a checkbox and pass parameter replace_existing_data:bool to self._ctr.on_csv_file_selected
             self.workOnlyWithNewCsvOrAddIt(csv_file)
 
     def workOnlyWithNewCsvOrAddIt(self, csv_file):
@@ -65,31 +70,18 @@ class Gui:
         y = (screen_height/2) - (self.heigth/2)
         choose_window.geometry('+%d+%d' % (x, y))
         tkinter.Button(
-            choose_window, text="Mit aktueller CSV Datei arbeiten", command=(lambda frame=choose_window, csv=csv_file, add=False: self.add_or_replace_data_in_data_model(frame, csv, add))).grid(column=0, row=0)
+            choose_window, text="Mit aktueller CSV Datei arbeiten", command=(lambda: self.add_or_replace_data_in_data_model(choose_window, csv_file, True))).grid(column=0, row=0)
         tkinter.Button(
-            choose_window, text="CSV Datei bestehenden Daten hinzufügen", command=(lambda frame=choose_window, csv=csv_file, add=True: self.add_or_replace_data_in_data_model(frame, csv, add))).grid(column=1, row=0)
+            choose_window, text="CSV Datei bestehenden Daten hinzufügen", command=(lambda: self.add_or_replace_data_in_data_model(choose_window, csv_file, False))).grid(column=1, row=0)
 
-    def add_or_replace_data_in_data_model(self, frame, csv_file, add):
+    def add_or_replace_data_in_data_model(self, frame, csv_file, replace_existing_data):
         """"""
-        parsed_csv_rows = self.parse_csv_to_rows(csv_file)
-        if add and self.data_model:
-            self.data_model.add_rows(parsed_csv_rows)
-        else:
-            self.data_model = DataModel(parsed_csv_rows)
+        self._ctr.on_csv_file_selected(csv_file, replace_existing_data)
         frame.destroy()
 
-    def parse_csv_to_rows(self, csv_file):
-        """ ist eigentlich keine Gui FUnktion, für eine PArserklasse aber zu trivial?"""
-        with open(csv_file, 'r') as csv_data:
-            reader = csv.reader(csv_data, delimiter=';')
-            parsed_rows = []
-            for csv_row in reader:
-                parsed_rows.append(csv_row)
-        return parsed_rows
-
-    def show_csv_on_display(self):
-        """"""
-        self.data_model.show_relevant_data()
-
-STARTING_GUI = Gui(800, 800)
-STARTING_GUI.start()
+    def display_data(self, data: List):
+        root = tkinter.Tk()
+        for row_index, data_row in enumerate(data):
+            for col_index, data_col_value in enumerate(data_row.row_dict.values()):
+                tkinter.Label(root, text=data_col_value).grid(
+                    row=row_index, column=col_index*2, padx=5)
