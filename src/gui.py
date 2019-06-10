@@ -1,5 +1,6 @@
 """blabla class"""
 
+from typing import Dict
 from typing import List
 
 import tkinter
@@ -79,9 +80,10 @@ class Gui:
         self._ctr.on_csv_file_selected(csv_file, replace_existing_data)
         frame.destroy()
 
-    def display_data(self, data: List):
+    def display_data(self, data: List[Dict]):
         root = tkinter.Tk()
         for row_index, data_row in enumerate(data):
-            for col_index, data_col_value in enumerate(data_row.row_dict.values()):
+            # FIXME: This won't work, since order in a dict isn't guaranteed.
+            for col_index, data_col_value in enumerate(data_row.values()):
                 tkinter.Label(root, text=data_col_value).grid(
                     row=row_index, column=col_index*2, padx=5)

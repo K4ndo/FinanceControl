@@ -25,10 +25,10 @@ class DataModel:
     @property
     def relevant_data(self) -> List:
         relevant = []
-        for data_row in self.data:
-            for data_col_key in data_row.row_dict.keys():
-                if data_col_key in _RELEVANT_DATA_ROWS:
-                    relevant.append(data_row)
+        row_dictionaries = map(lambda row: row.row_dict, self.data)
+        for row_dictionary in row_dictionaries:
+            relevant_sub_dictionary = {k: v for k, v in row_dictionary.items() if k in _RELEVANT_DATA_ROWS}
+            relevant.append(relevant_sub_dictionary)
         return relevant
 
     def set_view(self, main_gui: gui.Gui):
