@@ -1,33 +1,50 @@
+import csv
+from typing import List
 import tkinter
+
+import gui
 from RowCategories import RowCategories
 from Rows import Row
 
 
+_RELEVANT_DATA_ROWS = [
+    RowCategories.AUFTRAGSKONTO.value,
+    RowCategories.BETRAG.value,
+    RowCategories.BUCHUNGSTAG.value
+]
+
 class DataModel:
     ''''''
-    relevant_data = [RowCategories.AUFTRAGSKONTO.value,
-                     RowCategories.BETRAG.value, RowCategories.BUCHUNGSTAG.value]
 
     def __init__(self, input_data=None):
         self.data = []
         if input_data:
             self.add_rows(input_data, 0)
+        self._gui = None
 
-    def add_rows(self, csv_data, start_index=1):
-        for csv_row in csv_data[start_index:]:
-            self.data.append(Row(csv_row))
+    @property
+    def relevant_data(self) -> List:
+        relevant = []
+        row_dictionaries = map(lambda row: row.row_dict, self.data)
+        for row_dictionary in row_dictionaries:
+            relevant_sub_dictionary = {k: v for k, v in row_dictionary.items() if k in _RELEVANT_DATA_ROWS}
+            relevant.append(relevant_sub_dictionary)
+        return relevant
 
-        print(self.data)
+    def set_view(self, main_gui: gui.Gui):
+        """ Must be the first method called.
+        """
+        self._gui = main_gui
 
-    def show_relevant_data(self):
-        ''' blub'''
-        root = tkinter.Tk()
-        row_index = 0
-        for data_row in self.data:
-            col_index = 0
-            for data_col_key, data_col_value in data_row.row_dict.items():
-                if data_col_key in self.relevant_data:
-                    tkinter.Label(root, text=data_col_value).grid(
-                        row=row_index, column=col_index, padx=5)
-                    col_index += 2
-            row_index += 1
+    def open_relevant_data_view(self):
+        self._gui.display_data(self.relevant_data)
+
+    def load_csv_file(self, csv_file_path: str, replace_existing_data=False):
+        with open(csv_file_path, 'r') as csv_file:
+            reader = csv.reader(csv_file, delimiter=';')
+            if replace_existing_data:
+                self.data.clear()
+            self.add_rows(list(reader))
+
+    def add_rows(self, csv_data: List, start_index=1):
+        self.data.extend([Row(csv_row) for csv_row in csv_data[start_index:]])
